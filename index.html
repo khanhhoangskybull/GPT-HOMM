@@ -9,8 +9,9 @@
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
   <body>
+    <script src ="TranscriptionScript.js"></script>
     <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=360 height=640 tabindex="-1"></canvas>
+      <canvas id="unity-canvas" width=960 height=600></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
@@ -57,11 +58,11 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/GPT-HOMM.loader.js";
+      var loaderUrl = buildUrl + "/GPT-GeneralComander.loader.js";
       var config = {
-        dataUrl: buildUrl + "/GPT-HOMM.data.unityweb",
-        frameworkUrl: buildUrl + "/GPT-HOMM.framework.js.unityweb",
-        codeUrl: buildUrl + "/GPT-HOMM.wasm.unityweb",
+        dataUrl: buildUrl + "/GPT-GeneralComander.data.unityweb",
+        frameworkUrl: buildUrl + "/GPT-GeneralComander.framework.js.unityweb",
+        codeUrl: buildUrl + "/GPT-GeneralComander.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Skybull",
         productName: "SkybullBaseTemplate",
