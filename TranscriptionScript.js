@@ -56,11 +56,11 @@ function runspeechrecognition(listenContinuous) {
         //    }, 100);
         //}
 
-        //if (listenContinuous && !stop) {
-        //    setTimeout(() => {
-        //        if (!started) recognization.start();
-        //    }, 100);
-        //}
+        if (listenContinuous && !stop) {
+            setTimeout(() => {
+                if (!started) recognization.start();
+            }, 100);
+        }
     };
 
     // Start recognition if it is not running and has not been stopped
