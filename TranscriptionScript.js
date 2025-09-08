@@ -22,7 +22,7 @@ function runspeechrecognition(listenContinuous) {
         var transcript = e.results[0][0].transcript;
         console.log("Speech recognition result:", transcript);
 
-        window.Gameinstance.SendMessage(GameObjName, "Result", transcript);
+        window.Gameinstance.SendMessage(GameObjName, "OnMicResult", transcript);
         result = true;
 
         if (listenContinuous && !stop) {
@@ -37,14 +37,17 @@ function runspeechrecognition(listenContinuous) {
     recognization.onend = () => {
         console.log("Speech recognition ended");
         started = false;
+		
+		window.Gameinstance.SendMessage(GameObjName, "OnMicEnd");
+        stop = true;
 
-        if (!result && listenContinuous && !stop) {
-            setTimeout(() => {
-                if (!started) {
-                    recognization.start(); // Restart recognition
-                }
-            }, 100);
-        }
+        // if (!result && listenContinuous && !stop) {
+            // setTimeout(() => {
+                // if (!started) {
+                    // recognization.start(); // Restart recognition
+                // }
+            // }, 100);
+        // }
     };
 
     // Start recognition if it is not running and has not been stopped
