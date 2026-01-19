@@ -210,6 +210,11 @@
     if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.enableClosingConfirmation();
+	  
+	  window.addEventListener('unload', function () {
+        if (typeof ByteBrew !== 'undefined') {          
+          ByteBrew.endCurrentSession();
+        }
     }
   });
 </script>
