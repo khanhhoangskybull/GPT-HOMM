@@ -122,25 +122,27 @@
 
         // ---- web requestor (khớp .jspre) ----
         function sendRequest(url, bodyObj, useBeacon = false) {
-            bodyObj.sdk_key = appKey;
             const payload = JSON.stringify(bodyObj);
 
-            if (useBeacon) {
-                // Dùng Beacon API (Ping) - Bây giờ sẽ chạy vì không còn Custom Header gây lỗi CORS
-                return Promise.resolve(navigator.sendBeacon(url, payload));
-            }
-            
-            const opt = {
+            // Cấu hình chuẩn để ByteBrew không lỗi đỏ (Status 200)
+            const options = {
                 method: 'POST',
                 mode: 'cors',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'text/plain'
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'sdk-key': appKey // Giữ lại Header vì ByteBrew bắt buộc cần
                 },
                 body: payload,
-                keepalive: true
+                keepalive: true // Giúp request tiếp tục chạy khi đóng tab
             };
-            return fetch(url, opt);
+
+            if (useBeacon) {
+                // Khi đóng app, chúng ta dùng fetch + keepalive thay vì navigator.sendBeacon
+                // vì Beacon KHÔNG cho phép gửi sdk-key trong Header.
+                return fetch(url, options).catch(e => console.warn("Keepalive fetch failed", e));
+            }
+            return fetch(url, options);
         }
 
         function sendRemoteConfigRequest(url) {
