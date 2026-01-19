@@ -124,9 +124,26 @@
         function sendRequest(url, bodyObj, useBeacon = false) {
             const payload = JSON.stringify(bodyObj);
 
-            if (useBeacon && navigator.sendBeacon) {
-                return Promise.resolve(navigator.sendBeacon(url, payload));
+            if (useBeacon) {
+                // Chúng ta sử dụng fetch + keepalive nhưng KHÔNG CÓ CUSTOM HEADER
+                // Đưa sdk_key vào body để server có thể nhận diện (nếu server hỗ trợ)
+                const beaconBody = JSON.parse(payload);
+                beaconBody.sdk_key = appKey;
+
+                return fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors', // Dùng no-cors để ép trình duyệt không kiểm tra Preflight
+                    headers: {
+                        'Content-Type': 'text/plain' // Simple Content-Type để tránh OPTIONS
+                    },
+                    body: JSON.stringify(beaconBody),
+                    keepalive: true
+                }).catch(() => {});
             }
+            
+            // if (useBeacon && navigator.sendBeacon) {
+            //     return Promise.resolve(navigator.sendBeacon(url, payload));
+            // }
             
             const options = {
                 method: 'POST',
