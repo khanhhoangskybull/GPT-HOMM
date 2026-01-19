@@ -250,11 +250,11 @@
                 }
             });
 
-            sendRequest(LOGS_URL, payload).then(res => {
-                if (res && res.ok) console.log('ByteBrew: End Current Session Event Sent Successfully');
-                else console.log('ByteBrew: End Current Session Event Failed to Send: Status ' + (res ? res.status : 'No Response'));
-            }).catch(console.error);
+            // THAY ĐỔI Ở ĐÂY: Thêm tham số 'true' để kích hoạt useBeacon
+            // Vì Beacon không trả về Promise như fetch, chúng ta không dùng .then() ở đây
+            sendRequest(LOGS_URL, payload, true);
 
+            console.log('ByteBrew: Beacon sent to browser queue.');
             initialized = false;
         }
 
