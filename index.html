@@ -209,13 +209,16 @@
   document.addEventListener("DOMContentLoaded", function () {
     if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.ready();
+      // Bật xác nhận đóng
       Telegram.WebApp.enableClosingConfirmation();
-	  
-	  window.addEventListener('unload', function () {
+      
+      // Lắng nghe sự kiện đóng/thoát trang
+      window.addEventListener('unload', function () {
         if (typeof ByteBrew !== 'undefined') {          
           ByteBrew.endCurrentSession();
         }
-    });
+      });
+    } // <-- Bạn từng thiếu dấu đóng này
   });
 </script>
   </body>
