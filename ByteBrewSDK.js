@@ -250,7 +250,10 @@
                 }
             });
 
-            sendRequest(LOGS_URL, payload);
+            sendRequest(LOGS_URL, payload).then(res => {
+                if (res && res.ok) console.log('ByteBrew: End Current Session Event Sent Successfully');
+                else console.log('ByteBrew: End Current Session Event Failed to Send: Status ' + (res ? res.status : 'No Response'));
+            }).catch(console.error);
 
             initialized = false;
         }
