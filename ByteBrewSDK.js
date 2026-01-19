@@ -121,7 +121,13 @@
         }
 
         // ---- web requestor (khớp .jspre) ----
-        function sendRequest(url, bodyObj) {
+        function sendRequest(url, bodyObj, useBeacon = false) {
+            const payload = JSON.stringify(bodyObj);
+
+            if (useBeacon && navigator.sendBeacon) {
+                return Promise.resolve(navigator.sendBeacon(url, payload));
+            }
+
             const opt = {
                 method: 'POST',
                 mode: 'cors',
@@ -130,7 +136,7 @@
                     'Content-Type': 'application/json;charset=UTF-8',
                     'sdk-key': appKey
                 },
-                body: JSON.stringify(bodyObj),
+                body: payload,
                 keepalive: true
             };
             return fetch(url, opt);
@@ -230,17 +236,23 @@
 
         function endCurrentSession() {
             if (!(initialized && getTrackingSettingsCookie())) return;
-            initialized = false;
-            console.log('ByteBrew: Ending Current Session');
 
             const now = new Date();
-            const secs = Math.max(0, Math.round((now.getTime() - (sessionStartTime ? sessionStartTime.getTime() : now.getTime())) / 1000));
+            const secs = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
+
+            console.log('ByteBrew: Ending Session. Length: ' + secs + 's');
+
             const payload = Object.assign({}, fullEvent(), {
                 category: 'session',
-                externalData: { sessionLength: String(secs) }
+                externalData: {
+                    sessionLength: String(secs),
+                    length: secs
+                }
             });
-            // fire-and-forget
-            sendRequest(LOGS_URL, payload).catch(console.error);
+
+            sendRequest(LOGS_URL, payload);
+
+            initialized = false;
         }
 
         function sendCustomEvent(eventName, value) {
