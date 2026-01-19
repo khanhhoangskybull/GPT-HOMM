@@ -124,9 +124,23 @@
         function sendRequest(url, bodyObj, useBeacon = false) {
             const payload = JSON.stringify(bodyObj);
 
-            if (useBeacon && navigator.sendBeacon) {
-                return Promise.resolve(navigator.sendBeacon(url, payload));
+            if (useBeacon) {
+                return fetch(url, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'sdk-key': appKey // THÊM HEADER QUAN TRỌNG NÀY
+                    },
+                    body: payload,
+                    keepalive: true // ĐẢM BẢO REQUEST CHẠY KHI ĐÓNG TAB
+                });
             }
+            
+            // if (useBeacon && navigator.sendBeacon) {
+            //     return Promise.resolve(navigator.sendBeacon(url, payload));
+            // }
 
             const opt = {
                 method: 'POST',
