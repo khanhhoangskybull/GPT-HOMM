@@ -206,32 +206,28 @@
 })();
 </script>
 <script type="text/javascript">
-  document.addEventListener("DOMContentLoaded", function () {
-    console.log("Checking Telegram WebApp...");
+  window.addEventListener("load", function () { // Dùng 'load' thay vì 'DOMContentLoaded' để đợi tất cả script tải xong
+    console.log("All resources loaded.");
 
     if (window.Telegram && Telegram.WebApp) {
-      console.log("Telegram WebApp detected. Version:", Telegram.WebApp.version);
-      
       Telegram.WebApp.ready();
       Telegram.WebApp.enableClosingConfirmation();
-      console.log("Closing Confirmation Enabled.");
 
-      // Sử dụng cả hai sự kiện để tăng độ tin cậy
-      const handleQuit = function () {
-        console.log("Quit event triggered (pagehide/unload).");
+      window.addEventListener('pagehide', function () {
+        // Kiểm tra mọi khả năng của biến ByteBrew
+        var bb = window.ByteBrew || ByteBrew; 
         
-        if (typeof ByteBrew !== 'undefined') {
-          console.log("Calling ByteBrew.endCurrentSession()...");
-          ByteBrew.endCurrentSession();
+        if (typeof bb !== 'undefined') {
+          console.log("ByteBrew found! Closing session...");
+          bb.endCurrentSession();
         } else {
-          console.warn("ByteBrew SDK not found in JavaScript context!");
+          // Nếu vẫn không thấy, thử gọi thông qua unityInstance (nếu bạn có lưu biến này)
+          console.warn("ByteBrew not found in JS. Trying Unity Bridge...");
+          if (typeof myUnityInstance !== 'undefined') {
+             myUnityInstance.SendMessage('ByteBrew', 'EndSession');
+          }
         }
-      };
-
-      window.addEventListener('pagehide', handleQuit);
-      window.addEventListener('unload', handleQuit);
-    } else {
-      console.error("Telegram WebApp SDK not found!");
+      });
     }
   });
 </script>
