@@ -207,18 +207,32 @@
 </script>
 <script type="text/javascript">
   document.addEventListener("DOMContentLoaded", function () {
+    console.log("Checking Telegram WebApp...");
+
     if (window.Telegram && Telegram.WebApp) {
-      Telegram.WebApp.ready();
-      // Bật xác nhận đóng
-      Telegram.WebApp.enableClosingConfirmation();
+      console.log("Telegram WebApp detected. Version:", Telegram.WebApp.version);
       
-      // Lắng nghe sự kiện đóng/thoát trang
-      window.addEventListener('unload', function () {
-        if (typeof ByteBrew !== 'undefined') {          
+      Telegram.WebApp.ready();
+      Telegram.WebApp.enableClosingConfirmation();
+      console.log("Closing Confirmation Enabled.");
+
+      // Sử dụng cả hai sự kiện để tăng độ tin cậy
+      const handleQuit = function () {
+        console.log("Quit event triggered (pagehide/unload).");
+        
+        if (typeof ByteBrew !== 'undefined') {
+          console.log("Calling ByteBrew.endCurrentSession()...");
           ByteBrew.endCurrentSession();
+        } else {
+          console.warn("ByteBrew SDK not found in JavaScript context!");
         }
-      });
-    } // <-- Bạn từng thiếu dấu đóng này
+      };
+
+      window.addEventListener('pagehide', handleQuit);
+      window.addEventListener('unload', handleQuit);
+    } else {
+      console.error("Telegram WebApp SDK not found!");
+    }
   });
 </script>
   </body>
