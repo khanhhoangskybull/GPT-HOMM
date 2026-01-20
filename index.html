@@ -212,18 +212,29 @@
     if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.enableClosingConfirmation();
+	  
+	  const originalClose = Telegram.WebApp.close;
+	  Telegram.WebApp.close = function() {
+		  var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
+		  if (bb) {
+			  // Bắn event ngay lập tức khi lệnh close được gọi
+			  console.log("ByteBrew SDK found! Ending session...")
+			  bb.endCurrentSession();
+		  }
+		  originalClose.apply(this, arguments);
+	  };
 
-      window.addEventListener('pagehide', function () {
-        // Kiểm tra mọi khả năng của biến ByteBrew
-        var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew; 
+      <!-- window.addEventListener('pagehide', function () { -->
+        <!-- // Kiểm tra mọi khả năng của biến ByteBrew -->
+        <!-- var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;  -->
         
-        if (bb && typeof bb.endCurrentSession === 'function') {
-          console.log("ByteBrew SDK found! Ending session...");
-          bb.endCurrentSession();
-        } else {
-          console.warn("ByteBrew SDK still not found at window.ByteBrewSDK.ByteBrew");
-        }
-      });
+        <!-- if (bb && typeof bb.endCurrentSession === 'function') { -->
+          <!-- console.log("ByteBrew SDK found! Ending session..."); -->
+          <!-- bb.endCurrentSession(); -->
+        <!-- } else { -->
+          <!-- console.warn("ByteBrew SDK still not found at window.ByteBrewSDK.ByteBrew"); -->
+        <!-- } -->
+      <!-- }); -->
     }
   });
 </script>
