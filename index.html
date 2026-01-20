@@ -225,12 +225,15 @@
     }
 
     function sendExitEvent() {
+			console.log("send Exit Event...");
         var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
         if (bb && bb.isByteBrewInitialized()) {
             console.log("Exit detected! Sending event...");
             // Đảm bảo hàm endCurrentSession trong ByteBrewSDK.js đã được cập nhật keepalive:true
             bb.endCurrentSession();
-        }
+        }else{
+			console.log("ByteBrew be not found...");
+		}
     }
   });
 </script>
