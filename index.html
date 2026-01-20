@@ -211,24 +211,22 @@
       Telegram.WebApp.ready();
       Telegram.WebApp.enableClosingConfirmation();
 
-      // Sử dụng 'blur' để bắt khoảnh khắc ngay trước khi popup hiện
+      // Dùng blur để "đi trước" popup của Telegram
       window.addEventListener("blur", function() {
-          console.log("Window blur detected - triggering exit logic...");
+          console.log("Detected blur (Popup may be appearing). Sending event...");
           sendExitEvent();
       });
 
-      // Dự phòng cho các hành động đóng app khác
+      // Dự phòng khi đóng hẳn
       window.addEventListener("pagehide", sendExitEvent);
     }
 
     function sendExitEvent() {
         var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
-        if (bb && bb.isByteBrewInitialized()) {
-            console.log("ByteBrew Session Ending...");
+        // Kiểm tra xem SDK đã được load chưa
+        if (bb) {
+            // Gọi trực tiếp hàm gửi, kể cả khi chưa nhận được session_key hoàn toàn
             bb.endCurrentSession();
-            // Lưu ý: Request fetch trong ByteBrewSDK.js phải có keepalive: true
-        } else {
-            console.warn("ByteBrew not ready or not initialized.");
         }
     }
   });

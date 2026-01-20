@@ -133,11 +133,15 @@
                     'sdk-key': appKey
                 },
                 body: payload,
-                keepalive: true
+                keepalive: true 
             }).then(res => {
                 if (!res.ok) return null;
                 return res.text().then(text => {
-                    return text ? JSON.parse(text) : {}; // Đã xóa 
+                    try {
+                        return text ? JSON.parse(text) : {};
+                    } catch (e) {
+                        return {};
+                    }
                 });
             }).catch(err => console.warn("ByteBrew Request Silent Fail:", err));
         }
