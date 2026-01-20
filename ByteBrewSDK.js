@@ -124,15 +124,22 @@
         function sendRequest(url, bodyObj, useBeacon = false) {
             const payload = JSON.stringify(bodyObj);
 
-            if (useBeacon && navigator.sendBeacon) {
-                const blob = new Blob([payload], {
-                    type: 'application/json'
-                });
-                navigator.sendBeacon(url, blob);
-                return;
+            if (useBeacon) {
+                return fetch(url, {
+                    method: 'POST',
+                    mode: 'cors',
+                    keepalive: true,
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'sdk-key': appKey
+                    },
+                    body: payload
+                }).catch(err =>
+                    console.warn("ByteBrew Beacon-like Request Fail:", err)
+                );
             }
 
-            // ✅ NORMAL FLOW — giữ NGUYÊN như trước
             return fetch(url, {
                 method: 'POST',
                 mode: 'cors',
