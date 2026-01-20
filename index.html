@@ -214,16 +214,22 @@
       Telegram.WebApp.enableClosingConfirmation();
 	  
 	  
-	  Telegram.WebApp.onEvent('closingConfirmationHasChanged', function(data) {
-        if (data.is_enabled) {
-            var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
-            if (bb) {
-                console.log("ByteBrew SDK found! Ending session...")
-				bb.endCurrentSession();
-            } else {
-				console.warn("ByteBrew SDK still not found at window.ByteBrewSDK.ByteBrew");
-			}         
-		}}
+	  window.addEventListener('blur', function() {
+        var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
+        if (bb && bb.isByteBrewInitialized()) {
+            console.log("Detecting potential exit popup... Sending ByteBrew event.");
+            // Bắn event ngay lập tức khi popup vừa hiện (trang bị mờ đi)
+            bb.endCurrentSession();
+        }
+		});
+
+		// Dự phòng: Ghi đè hàm close nếu ứng dụng tự gọi
+		var originalClose = Telegram.WebApp.close;
+		Telegram.WebApp.close = function() {
+			var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
+			if (bb) bb.endCurrentSession();
+			originalClose.apply(this, arguments);
+		};
     }});
 	  
 	  <!-- const originalClose = Telegram.WebApp.close; -->
