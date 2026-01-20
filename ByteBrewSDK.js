@@ -266,7 +266,7 @@
 
             // THAY ĐỔI Ở ĐÂY: Thêm tham số 'true' để kích hoạt useBeacon
             // Vì Beacon không trả về Promise như fetch, chúng ta không dùng .then() ở đây
-            sendRequest(LOGS_URL, payload, true);
+            sendRequest(LOGS_URL, payload, false);
 
             console.log('ByteBrew: Beacon sent to browser queue.');
             initialized = false;
