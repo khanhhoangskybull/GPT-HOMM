@@ -206,29 +206,43 @@
 })();
 </script>
 <script type="text/javascript">
-  window.addEventListener("load", function () {
-    if (window.Telegram && window.Telegram.WebApp) {
+  // Hàm này phải nằm ngoài để đảm bảo có thể gọi bất cứ lúc nào
+  function sendExitEvent() {
+      console.log("CRITICAL: sendExitEvent triggered!"); // Log này CHẮC CHẮN phải hiện
+      var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
+      
+      if (bb) {
+          console.log("ByteBrew found. Sending end session...");
+          bb.endCurrentSession();
+      } else {
+          console.error("ByteBrew SDK not found at exit!");
+      }
+  }
+
+  // Bật Telegram Confirmation
+  if (window.Telegram && window.Telegram.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.enableClosingConfirmation();
+  }
 
-      // Dùng blur để "đi trước" popup của Telegram
-      window.addEventListener("blur", function() {
-          console.log("Detected blur (Popup may be appearing). Sending event...");
+  // Bắt sự kiện 'blur' - Đây là lúc người dùng chạm vào nút đóng/vuốt xuống
+  window.addEventListener("blur", function() {
+      console.log("Event: Window Blur (Potential Exit)");
+      sendExitEvent();
+  });
+
+  // Bắt sự kiện 'pagehide' - Khi app bắt đầu bị đóng băng
+  window.addEventListener("pagehide", function() {
+      console.log("Event: Page Hide");
+      sendExitEvent();
+  });
+
+  // Bắt sự kiện 'visibilitychange'
+  document.addEventListener("visibilitychange", function() {
+      console.log("Visibility State: " + document.visibilityState);
+      if (document.visibilityState === 'hidden') {
           sendExitEvent();
-      });
-
-      // Dự phòng khi đóng hẳn
-      window.addEventListener("pagehide", sendExitEvent);
-    }
-
-    function sendExitEvent() {
-        var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
-        // Kiểm tra xem SDK đã được load chưa
-        if (bb) {
-            // Gọi trực tiếp hàm gửi, kể cả khi chưa nhận được session_key hoàn toàn
-            bb.endCurrentSession();
-        }
-    }
+      }
   });
 </script>
   </body>
