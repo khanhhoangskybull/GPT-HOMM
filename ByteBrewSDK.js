@@ -124,6 +124,17 @@
         function sendRequest(url, bodyObj, useBeacon = false) {
             const payload = JSON.stringify(bodyObj);
 
+            if (useBeacon && navigator.sendBeacon) {
+                const blob = new Blob([payload], {
+                    type: 'application/json'
+                });
+
+                const ok = navigator.sendBeacon(url, blob);
+                console.log('ByteBrew sendBeacon:', ok);
+                return;
+            }
+
+            // fallback fetch (non-close cases)
             return fetch(url, {
                 method: 'POST',
                 mode: 'cors',
@@ -133,16 +144,7 @@
                     'sdk-key': appKey
                 },
                 body: payload,
-                keepalive: true 
-            }).then(res => {
-                if (!res.ok) return null;
-                return res.text().then(text => {
-                    try {
-                        return text ? JSON.parse(text) : {};
-                    } catch (e) {
-                        return {};
-                    }
-                });
+                keepalive: true
             }).catch(err => console.warn("ByteBrew Request Silent Fail:", err));
         }
 
