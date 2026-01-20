@@ -235,9 +235,7 @@
         }
     }
   });
-</script>
-<script>
-document.getElementById('test-exit-btn').addEventListener('click', function() {
+  document.getElementById('test-exit-btn').addEventListener('click', function() {
     console.log("Manual Test: Triggering exit event...");
     sendExitEvent(); 
     alert("Check tab Network và Console xem có request 'logs/add' không!");
