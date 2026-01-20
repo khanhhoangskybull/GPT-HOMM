@@ -239,7 +239,7 @@
         }
 
         function endCurrentSession() {
-            if (!(initialized && getTrackingSettingsCookie())) return;
+            if (!getTrackingSettingsCookie()) return;
 
             const now = new Date();
             const secs = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
