@@ -138,6 +138,7 @@
             return fetch(url, {
                 method: 'POST',
                 mode: 'cors',
+                credentials: 'omit',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
