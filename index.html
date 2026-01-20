@@ -215,30 +215,26 @@
 	  
 	  
 	 document.addEventListener("visibilitychange", function() {
-        if (document.visibilityState === 'hidden') {
-            var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
-            if (bb && bb.isByteBrewInitialized()) {
-                console.log("Popup detection: Sending event via visibilitychange...");
-                bb.endCurrentSession(); 
-                // Nếu SDK của bạn có hàm Flush (đẩy data ngay lập tức), hãy gọi nó ở đây.
-            }else{
-				console.log("bb null...");
-			}
+    if (document.visibilityState === 'hidden') {
+        var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
+        if (bb && bb.isByteBrewInitialized()) {
+            console.log("Popup detected via visibilitychange. Sending ByteBrew event...");
+            // Gửi event ngay lập tức
+            bb.endCurrentSession();
         }
-    });
+    }
+});
 
-		// Dự phòng: Ghi đè hàm close nếu ứng dụng tự gọi
-		var originalClose = Telegram.WebApp.close;
+	if (window.Telegram && window.Telegram.WebApp) {
+    var originalClose = Telegram.WebApp.close;
     Telegram.WebApp.close = function() {
         var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
-        if (bb) bb.endCurrentSession();
-        
-        // Tạo một khoảng trễ nhỏ 100ms để request kịp gửi đi trước khi close app
-        setTimeout(function() {
-            originalClose.apply(this, arguments);
-        }, 100);
+        if (bb && bb.isByteBrewInitialized()) {
+            bb.endCurrentSession();
+        }
+        originalClose.apply(this, arguments);
     };
-	});
+});
 	  
 </script>
   </body>

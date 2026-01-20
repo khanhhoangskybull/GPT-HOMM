@@ -124,7 +124,6 @@
         function sendRequest(url, bodyObj, useBeacon = false) {
             const payload = JSON.stringify(bodyObj);
 
-            [cite_start]// Sử dụng fetch với keepalive để đảm bảo request bay đi ngay cả khi popup hiện/đóng 
             return fetch(url, {
                 method: 'POST',
                 mode: 'cors',
@@ -136,12 +135,11 @@
                 body: payload,
                 keepalive: true
             }).then(res => {
-                // KIỂM TRA PHẢN HỒI TRƯỚC KHI PARSE JSON
                 if (!res.ok) return null;
                 return res.text().then(text => {
-                    [cite_start]return text ? JSON.parse(text) : {}; // Nếu text trống thì trả về object rỗng thay vì báo lỗi 
+                    return text ? JSON.parse(text) : {}; // Đã xóa 
                 });
-            }).catch(err => console.warn("ByteBrew Request Silent Fail (Normal on Exit):", err));
+            }).catch(err => console.warn("ByteBrew Request Silent Fail:", err));
         }
 
         function sendRemoteConfigRequest(url) {
