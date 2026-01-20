@@ -122,7 +122,9 @@
 
         // ---- web requestor (khớp .jspre) ----
         function sendRequest(url, bodyObj, useBeacon = false) {
+            console.log("Send Request 1 ", bodyObj);
             const payload = JSON.stringify(bodyObj);
+            console.log("Send Request 2 ", payload);
 
             if (useBeacon) {
                 return fetch(url, {
@@ -264,9 +266,7 @@
                 }
             });
 
-            // THAY ĐỔI Ở ĐÂY: Thêm tham số 'true' để kích hoạt useBeacon
-            // Vì Beacon không trả về Promise như fetch, chúng ta không dùng .then() ở đây
-            sendRequest(LOGS_URL, payload, false);
+            sendRequest(LOGS_URL, payload, true);
 
             console.log('ByteBrew: Beacon sent to browser queue.');
             initialized = false;
