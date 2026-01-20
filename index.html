@@ -213,16 +213,27 @@
       Telegram.WebApp.ready();
       Telegram.WebApp.enableClosingConfirmation();
 	  
-	  const originalClose = Telegram.WebApp.close;
-	  Telegram.WebApp.close = function() {
-		  var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
-		  if (bb) {
-			  // Bắn event ngay lập tức khi lệnh close được gọi
-			  console.log("ByteBrew SDK found! Ending session...")
-			  bb.endCurrentSession();
-		  }
-		  originalClose.apply(this, arguments);
-	  };
+	  
+	  Telegram.WebApp.onEvent('closingConfirmationHasChanged', function(data) {
+        if (data.is_enabled) {
+            var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
+            if (bb) {
+                console.log("ByteBrew SDK found! Ending session...")
+				bb.endCurrentSession();
+            }
+        }
+    });
+	  
+	  <!-- const originalClose = Telegram.WebApp.close; -->
+	  <!-- Telegram.WebApp.close = function() { -->
+		  <!-- var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew; -->
+		  <!-- if (bb) { -->
+			  <!-- // Bắn event ngay lập tức khi lệnh close được gọi -->
+			  <!-- console.log("ByteBrew SDK found! Ending session...") -->
+			  <!-- bb.endCurrentSession(); -->
+		  <!-- } -->
+		  <!-- originalClose.apply(this, arguments); -->
+	  <!-- }; -->
 
       <!-- window.addEventListener('pagehide', function () { -->
         <!-- // Kiểm tra mọi khả năng của biến ByteBrew -->
