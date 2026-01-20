@@ -124,45 +124,24 @@
         function sendRequest(url, bodyObj, useBeacon = false) {
             const payload = JSON.stringify(bodyObj);
 
-            if (useBeacon) {
-                // Chúng ta sử dụng fetch + keepalive nhưng KHÔNG CÓ CUSTOM HEADER
-                // Đưa sdk_key vào body để server có thể nhận diện (nếu server hỗ trợ)
-                const beaconBody = JSON.parse(payload);
-                beaconBody.sdk_key = appKey;
-
-                return fetch(url, {
-                    method: 'POST',
-                    mode: 'no-cors', // Dùng no-cors để ép trình duyệt không kiểm tra Preflight
-                    headers: {
-                        'Content-Type': 'text/plain' // Simple Content-Type để tránh OPTIONS
-                    },
-                    body: JSON.stringify(beaconBody),
-                    keepalive: true
-                }).catch(() => {});
-            }
-            
-            // if (useBeacon && navigator.sendBeacon) {
-            //     return Promise.resolve(navigator.sendBeacon(url, payload));
-            // }
-            
-            const options = {
+            [cite_start]// Sử dụng fetch với keepalive để đảm bảo request bay đi ngay cả khi popup hiện/đóng 
+            return fetch(url, {
                 method: 'POST',
                 mode: 'cors',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
-                    'sdk-key': appKey 
+                    'sdk-key': appKey
                 },
                 body: payload,
-                keepalive: true 
-            };
-
-            // if (useBeacon) {
-            //     // Khi đóng app, chúng ta dùng fetch + keepalive thay vì navigator.sendBeacon
-            //     // vì Beacon KHÔNG cho phép gửi sdk-key trong Header.
-            //     return fetch(url, options).catch(e => console.warn("Keepalive fetch failed", e));
-            // }
-            return fetch(url, options);
+                keepalive: true
+            }).then(res => {
+                // KIỂM TRA PHẢN HỒI TRƯỚC KHI PARSE JSON
+                if (!res.ok) return null;
+                return res.text().then(text => {
+                    [cite_start]return text ? JSON.parse(text) : {}; // Nếu text trống thì trả về object rỗng thay vì báo lỗi 
+                });
+            }).catch(err => console.warn("ByteBrew Request Silent Fail (Normal on Exit):", err));
         }
 
         function sendRemoteConfigRequest(url) {
