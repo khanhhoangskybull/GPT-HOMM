@@ -1,31 +1,59 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
+<head>
+    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@2.1.0/dist/tonconnect-ui.min.js"></script>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity WebGL Player | SkybullBaseTemplate</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes">
+    <style>
+	  html, body {
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
+		height: 100%;
+		width: 100%;
+		background: black;
+	  }
+
+	  #unity-container {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		overflow: hidden;
+		background: black;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	  }
+
+	  #unity-canvas {
+		display: block;
+		background: black;
+	  }
+</style>	
   </head>
   <body>
-      <script src="TranscriptionScript.js"></script>
-      <script src="ByteBrewSDK.js"></script>
-      <div id="unity-container" class="unity-desktop">
-          <canvas id="unity-canvas" width=960 height=600></canvas>
-          <div id="unity-loading-bar">
-              <div id="unity-logo"></div>
-              <div id="unity-progress-bar-empty">
-                  <div id="unity-progress-bar-full"></div>
-              </div>
-          </div>
-          <div id="unity-warning"> </div>
-          <div id="unity-footer">
-              <div id="unity-webgl-logo"></div>
-              <div id="unity-fullscreen-button"></div>
-              <div id="unity-build-title">SkybullBaseTemplate</div>
-          </div>
+    <script src ="TranscriptionScript.js"></script>
+	<script src="ByteBrewSDK.js"></script>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width=1080 height=1920 tabindex="1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
       </div>
-      <script>
+    </div>
+    <script>
+		Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+		
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
@@ -57,18 +85,44 @@
         updateBannerVisibility();
       }
 
-      var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/General_Comander_Build_Dev.loader.js";
-      var config = {
-        dataUrl: buildUrl + "/General_Comander_Build_Dev.data.unityweb",
-        frameworkUrl: buildUrl + "/General_Comander_Build_Dev.framework.js.unityweb",
-        codeUrl: buildUrl + "/General_Comander_Build_Dev.wasm.unityweb",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "Skybull",
-        productName: "SkybullBaseTemplate",
-        productVersion: "0.1.0",
-        showBanner: unityShowBanner,
-      };
+        var buildUrl = "Build";
+        var loaderUrl = buildUrl + "/General_Comander_Build_Dev.loader.js";
+        var config = {
+            dataUrl: buildUrl + "/General_Comander_Build_Dev.data.unityweb",
+            frameworkUrl: buildUrl + "/General_Comander_Build_Dev.framework.js.unityweb",
+            codeUrl: buildUrl + "/General_Comander_Build_Dev.wasm.unityweb",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "Skybull",
+            productName: "SkybullBaseTemplate",
+            productVersion: "0.1.0",
+            showBanner: unityShowBanner,
+        };
+	  
+	  function maintainAspectRatio() {
+		  const containerWidth = window.innerWidth;
+		  const containerHeight = window.innerHeight;
+		  const targetAspectRatio = 9 / 16;
+		  const containerAspectRatio = containerWidth / containerHeight;
+
+		  let newWidth, newHeight;
+
+		  if (containerAspectRatio > targetAspectRatio) {
+			newHeight = containerHeight;
+			newWidth = newHeight * targetAspectRatio;
+		  } else {
+			newWidth = containerWidth;
+			newHeight = newWidth / targetAspectRatio;
+		  }
+
+		  canvas.style.width = newWidth + "px";
+		  canvas.style.height = newHeight + "px";
+		}
+	
+		window.addEventListener("resize", maintainAspectRatio);
+		window.addEventListener("load", maintainAspectRatio);
+
+		document.querySelector("#unity-loading-bar").style.display = "block";
+
 
       // By default Unity keeps WebGL canvas render target size matched with
       // the DOM size of the canvas element (scaled by window.devicePixelRatio)
@@ -90,15 +144,8 @@
         // To lower canvas resolution on mobile devices to gain some
         // performance, uncomment the following line:
         // config.devicePixelRatio = 1;
-      } else {
-        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-
-        canvas.style.width = "360px";
-        canvas.style.height = "640px";
-      }
-
-      loadingBar.style.display = "block";
-
+      } 
+	  
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
@@ -107,36 +154,82 @@
         }).then((unityInstance) => {
           loadingBar.style.display = "none";
           Gameinstance =unityInstance;
-		  window.unityInstance=unityInstance;
-          fullscreenButton.onclick = () => {
-            unityInstance.SetFullscreen(1);
-          };
+		  window.unityInstance=unityInstance;          
         }).catch((message) => {
           alert(message);
         });
       };
       document.body.appendChild(script);
-      </script>
-	  
-	  <script type="text/javascript">
-  window.addEventListener("load", function () { // Dùng 'load' thay vì 'DOMContentLoaded' để đợi tất cả script tải xong
-    console.log("All resources loaded.");
+    </script>
+<script>
+(function () {
+  function patch(el) {
+    if (!el || el.dataset._oskPatched === "1") return;
+    el.dataset._oskPatched = "1";
 
-    if (window.Telegram && Telegram.WebApp) {
+    // Để Unity vẫn focus/đọc selection được:
+    el.removeAttribute("readonly");                   // KHÔNG readonly
+    el.removeAttribute("disabled");                   // KHÔNG disabled
+    // Ngăn hệ thống cố bật bàn phím (nhiều webview tôn trọng inputmode=none):
+    el.setAttribute("inputmode", "none");
+    el.setAttribute("autocomplete", "off");
+    el.setAttribute("autocapitalize", "off");
+    el.setAttribute("autocorrect", "off");
+    el.setAttribute("spellcheck", "false");
+
+    // Ẩn khỏi mắt người dùng nhưng vẫn focus được:
+    el.style.opacity = 0;
+    el.style.position = "fixed";
+    el.style.top = "-10000px";
+    el.style.left = "-10000px";
+    el.style.width = "1px";
+    el.style.height = "1px";
+    // LƯU Ý: đừng dùng pointerEvents = none; (một số trình duyệt sẽ từ chối focus)
+  }
+
+  // Patch những input đã có (nếu Unity tạo sớm)
+  Array.prototype.forEach.call(document.querySelectorAll("input,textarea"), patch);
+
+  // Patch những input Unity tạo sau này
+  const mo = new MutationObserver(muts => {
+    for (const m of muts) {
+      for (const n of m.addedNodes) {
+        if (n && (n.tagName === "INPUT" || n.tagName === "TEXTAREA")) patch(n);
+        // Unity đôi khi bọc input trong div
+        if (n && n.querySelectorAll) {
+          n.querySelectorAll("input,textarea").forEach(patch);
+        }
+      }
+    }
+  });
+  mo.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>
+<script type="text/javascript">
+  window.addEventListener("load", function () {
+    if (window.Telegram && window.Telegram.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.enableClosingConfirmation();
 
-      window.addEventListener('pagehide', function () {
-        // Kiểm tra mọi khả năng của biến ByteBrew
-        var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew; 
-        
-        if (bb && typeof bb.endCurrentSession === 'function') {
-          console.log("ByteBrew SDK found! Ending session...");
-          bb.endCurrentSession();
-        } else {
-          console.warn("ByteBrew SDK still not found at window.ByteBrewSDK.ByteBrew");
-        }
+      // Bắt khoảnh khắc ngay trước khi popup hệ thống hiện ra
+      window.addEventListener("blur", function() {
+          console.log("Window blur - User is attempting to close. Sending event...");
+          sendExitEvent();
       });
+
+      // Dự phòng cho trường hợp đóng hẳn hoặc chuyển trang
+      window.addEventListener("pagehide", sendExitEvent);
+    }
+
+    function sendExitEvent() {
+        var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
+        // Kiểm tra xem SDK có tồn tại không, bỏ qua check IsInitialized để ép gửi
+        if (bb) {
+            console.log("ByteBrew found. Executing endCurrentSession...");
+            bb.endCurrentSession();
+        } else {
+            console.error("ByteBrew SDK object not found!");
+        }
     }
   });
 </script>
