@@ -206,36 +206,36 @@
 })();
 </script>
 <script type="text/javascript">
-  window.addEventListener("load", function () { // Dùng 'load' thay vì 'DOMContentLoaded' để đợi tất cả script tải xong
+  window.addEventListener("load", function () {
     console.log("All resources loaded.");
 
-    if (window.Telegram && Telegram.WebApp) {
+    if (window.Telegram && window.Telegram.WebApp) {
+      // 1. Khởi tạo và Bật xác nhận đóng ngay lập tức
       Telegram.WebApp.ready();
       Telegram.WebApp.enableClosingConfirmation();
-	  
-	  
-	 document.addEventListener("visibilitychange", function() {
-    if (document.visibilityState === 'hidden') {
-        var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
-        if (bb && bb.isByteBrewInitialized()) {
-            console.log("Popup detected via visibilitychange. Sending ByteBrew event...");
-            // Gửi event ngay lập tức
-            bb.endCurrentSession();
-        }
-    }
-});
 
-	if (window.Telegram && window.Telegram.WebApp) {
-    var originalClose = Telegram.WebApp.close;
-    Telegram.WebApp.close = function() {
+      // 2. Ghi đè hàm close để bắn event khi app bị đóng chủ động từ code
+      var originalClose = Telegram.WebApp.close;
+      Telegram.WebApp.close = function() {
         var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
         if (bb && bb.isByteBrewInitialized()) {
-            bb.endCurrentSession();
+          bb.endCurrentSession();
         }
         originalClose.apply(this, arguments);
-    };
-});
-	  
+      };
+    }
+
+    // 3. Bắt sự kiện khi Popup confirm hiện lên (App bị hidden)
+    document.addEventListener("visibilitychange", function() {
+      if (document.visibilityState === 'hidden') {
+        var bb = window.ByteBrewSDK && window.ByteBrewSDK.ByteBrew;
+        if (bb && bb.isByteBrewInitialized()) {
+          console.log("Popup detected via visibilitychange. Sending ByteBrew event...");
+          bb.endCurrentSession();
+        }
+      }
+    });
+  }); // Đóng đúng ngoặc cho addEventListener 'load'
 </script>
   </body>
 </html>
