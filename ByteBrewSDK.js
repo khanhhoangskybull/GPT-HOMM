@@ -128,25 +128,23 @@
                 const blob = new Blob([payload], {
                     type: 'application/json'
                 });
-
-                const ok = navigator.sendBeacon(url, blob);
-                console.log('ByteBrew sendBeacon:', ok);
+                navigator.sendBeacon(url, blob);
                 return;
             }
 
-            // fallback fetch (non-close cases)
+            // ✅ NORMAL FLOW — giữ NGUYÊN như trước
             return fetch(url, {
                 method: 'POST',
                 mode: 'cors',
-                credentials: 'omit',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
                     'sdk-key': appKey
                 },
-                body: payload,
-                keepalive: true
-            }).catch(err => console.warn("ByteBrew Request Silent Fail:", err));
+                body: payload
+            }).catch(err =>
+                console.warn("ByteBrew Request Fail:", err)
+            );
         }
 
         function sendRemoteConfigRequest(url) {
