@@ -73,7 +73,7 @@
             return c || '??';
         }
         const country = getCountryCode();
-
+ 
         function tryGetUserIDFromCookie() {
             const fromCookie = Cookies.get(USER_ID_COOKIE);
             if (fromCookie) {
@@ -158,7 +158,7 @@
         }
 
         // ================= Public API (MUST match .jslib names) =================
-        function initializeByteBrew(_appId, _appKey, _appVersion) {
+        function initializeByteBrew(_appId, _appKey, _appVersion, _unityUserID) {
             console.log('ByteBrew: Starting Initialization');
             if (initialized) return;
 
@@ -173,9 +173,16 @@
                 return;
             }
 
-            const info = tryGetUserIDFromCookie();
-            userID = info.userID;
-
+            if (_unityUserID && _unityUserID.trim() !== "") {
+                userID = _unityUserID;
+                console.log('ByteBrew: Using UserID from Unity: ' + userID);
+                Cookies.set(USER_ID_COOKIE, userID, { expires: 365 });
+            } else {
+                const info = tryGetUserIDFromCookie();
+                userID = info.userID;
+                console.log('ByteBrew: Using UserID from Cookie: ' + userID);
+            }
+            
             appId = _appId;
             appKey = _appKey;
             appVersion = _appVersion || '';
