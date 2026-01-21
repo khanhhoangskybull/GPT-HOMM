@@ -39,9 +39,9 @@
 </style>	
   </head>
   <body>
-  <button id="test-exit-btn" style="position: fixed; top: 20px; left: 20px; z-index: 9999; padding: 10px; background: red; color: white; border: none; border-radius: 5px; cursor: pointer;">
-    TEST SEND EVENT (INGAME)
-</button>
+  <!-- <button id="test-exit-btn" style="position: fixed; top: 20px; left: 20px; z-index: 9999; padding: 10px; background: red; color: white; border: none; border-radius: 5px; cursor: pointer;"> -->
+    <!-- TEST SEND EVENT (INGAME) -->
+<!-- </button> -->
     <script src ="TranscriptionScript.js"></script>
 	<script src="ByteBrewSDK.js"></script>
     <div id="unity-container" class="unity-desktop">
@@ -229,12 +229,12 @@
           Telegram.WebApp.enableClosingConfirmation();
 
           // Bắt khoảnh khắc ngay trước khi popup hiện ra
-          <!-- window.addEventListener("blur", function() { -->
-              <!-- console.log("Window blur detected!"); -->
-              <!-- sendExitEvent(); -->
-          <!-- }); -->
+          window.addEventListener("blur", function() {
+              console.log("Window blur detected!");
+              sendExitEvent();
+          });
 
-          <!-- window.addEventListener("pagehide", sendExitEvent); -->
+          window.addEventListener("pagehide", sendExitEvent);
       }
 
       // 2. Đăng ký nút Test bên trong load để đảm bảo nút đã tồn tại
