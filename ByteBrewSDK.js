@@ -260,9 +260,10 @@
                 category: 'game_close',
                 sdk_key: appKey,
                 externalData: {
-                    sessionLength: String(secs),
-                    length: secs,
-                    auth_fallback: appKey
+                    sessionLength: String(secs)
+                    // ,
+                    // length: secs,
+                    // auth_fallback: appKey
                 }
             });
 
