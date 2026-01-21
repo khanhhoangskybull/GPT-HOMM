@@ -158,7 +158,7 @@
         }
 
         // ================= Public API (MUST match .jslib names) =================
-        function initializeByteBrew(_appId, _appKey, _appVersion, _unityUserID) {
+        function initializeByteBrew(_appId, _appKey, _appVersion, _unityUserID, _isNewUser) {
             console.log('ByteBrew: Starting Initialization');
             if (initialized) return;
 
@@ -172,17 +172,8 @@
                 console.log('ByteBrew: Tracking is disabled. Not initializing.');
                 return;
             }
-
-            if (_unityUserID && _unityUserID.trim() !== "") {
-                userID = _unityUserID;
-                console.log('ByteBrew: Using UserID from Unity: ' + userID);
-                Cookies.set(USER_ID_COOKIE, userID, { expires: 365 });
-            } else {
-                const info = tryGetUserIDFromCookie();
-                userID = info.userID;
-                console.log('ByteBrew: Using UserID from Cookie: ' + userID);
-            }
-            
+            console.log('ByteBrew: Using UserID from Unity: ' + _unityUserID);
+            userID = _unityUserID;
             appId = _appId;
             appKey = _appKey;
             appVersion = _appVersion || '';
@@ -192,9 +183,8 @@
             hasBeenInitializedWhilePageOpen = true;
 
             // User event: new/existing
-            const isNewUser = info.isNewUser || !info.hasSuccessfullyInitialized;
             const externalData = {
-                eventType: isNewUser ? 'new_user' : 'game_open',
+                eventType: _isNewUser ? 'new_user' : 'game_open',
                 userLocale: language
             };
             const payload = Object.assign({}, fullEvent(), {
