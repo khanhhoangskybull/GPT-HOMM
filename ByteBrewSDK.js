@@ -128,13 +128,10 @@
             const payload = JSON.stringify(bodyObj);
             console.log("Send Request 2 ", payload);
 
-            if (useBeacon) {
-                navigator.sendBeacon('/api/session/end', payload);
-            }
-
             return fetch(url, {
                 method: 'POST',
                 mode: 'cors',
+                keepalive: true,
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
@@ -269,9 +266,7 @@
             });
 
             sendRequest(LOGS_URL, payload, true);
-
             console.log('ByteBrew: Beacon sent to browser queue.');
-            initialized = false;
         }
 
         function sendCustomEvent(eventName, value) {
