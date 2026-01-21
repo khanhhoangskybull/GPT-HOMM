@@ -63,6 +63,8 @@
 
         let remoteConfigs = null; // Map<string,string> | null
 
+        let heartbeatInterval = null;
+
         const language = (navigator.language || '').toString();
         function getCountryCode() {
             const parts = (navigator.language || '').split('-');
@@ -209,6 +211,11 @@
                             console.log('ByteBrew: Initialization Complete');
                             // lắng nghe end session
                             window.addEventListener('beforeunload', endCurrentSession);
+
+                            if (!heartbeatInterval) {
+                                heartbeatInterval = setInterval(sendHeartbeat, 30000);
+                            }
+                            
                         } else {
                             console.log("ByteBrew: Initialization Failed! Couldn't get session key from ByteBrew: Status " + (res ? res.status : 'No Response'));
                         }
@@ -217,6 +224,12 @@
                     }
                 })
                 .catch(err => console.error(err));
+        }
+
+        function sendHeartbeat() {
+            if (!initialized) return;
+            console.log('ByteBrew: Heartbeat sent', new Date());
+            endCurrentSession();
         }
 
         function reinitializeByteBrew() {
