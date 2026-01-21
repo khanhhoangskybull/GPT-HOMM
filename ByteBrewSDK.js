@@ -127,19 +127,7 @@
             console.log("Send Request 2 ", payload);
 
             if (useBeacon) {
-                return fetch(url, {
-                    method: 'POST',
-                    mode: 'cors',
-                    keepalive: true,
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json;charset=UTF-8',
-                        'sdk-key': appKey
-                    },
-                    body: payload
-                }).catch(err =>
-                    console.warn("ByteBrew Beacon-like Request Fail:", err)
-                );
+                navigator.sendBeacon('/api/session/end', payload);
             }
 
             return fetch(url, {
@@ -257,7 +245,7 @@
             console.log('ByteBrew: Ending Session. Length: ' + secs + 's');
 
             const payload = Object.assign({}, fullEvent(), {
-                category: 'game_close',
+                category: 'session',
                 sdk_key: appKey,
                 externalData: {
                     sessionLength: String(secs)
