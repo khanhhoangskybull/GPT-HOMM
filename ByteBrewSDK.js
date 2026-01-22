@@ -207,9 +207,9 @@
                             // window.addEventListener('beforeunload', endCurrentSession);
                             window.Telegram.WebApp.onEvent('viewportChanged', endCurrentSession());
                             
-                            if (!heartbeatInterval) {
-                                heartbeatInterval = setInterval(sendHeartbeat, 30000);
-                            }
+                            // if (!heartbeatInterval) {
+                            //     heartbeatInterval = setInterval(sendHeartbeat, 30000);
+                            // }
                             
                         } else {
                             console.log("ByteBrew: Initialization Failed! Couldn't get session key from ByteBrew: Status " + (res ? res.status : 'No Response'));
