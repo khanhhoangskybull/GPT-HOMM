@@ -205,7 +205,7 @@
                             console.log('ByteBrew: Initialization Complete');
                             // lắng nghe end session
                             // window.addEventListener('beforeunload', endCurrentSession);
-                            window.Telegram.WebApp.onEvent('viewportChanged', endCurrentSession());
+                            window.Telegram.WebApp.onEvent('viewportChanged', endCurrentSession);
                             
                             if (!heartbeatInterval) {
                                 heartbeatInterval = setInterval(sendHeartbeat, 30000);
@@ -228,8 +228,6 @@
         }
         
         function sendStayActiveEvent() {
-            if (!getTrackingSettingsCookie()) return;
-            
             const payload = Object.assign({}, fullEvent(), {
                 category: 'custom_event',
                 sdk_key: appKey,
