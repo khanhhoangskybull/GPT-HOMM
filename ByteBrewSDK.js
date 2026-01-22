@@ -224,7 +224,23 @@
         function sendHeartbeat() {
             if (!initialized) return;
             console.log('ByteBrew: Heartbeat sent', new Date());
-            endCurrentSession(30);
+            sendStayActiveEvent();
+        }
+        
+        function sendStayActiveEvent() {
+            if (!getTrackingSettingsCookie()) return;
+            
+            const payload = Object.assign({}, fullEvent(), {
+                category: 'custom_event',
+                sdk_key: appKey,
+                externalData: {
+                    event_name: 'stay_active',
+                    total_duration: String(30)
+                }
+            });
+
+            sendRequest(LOGS_URL, payload, true);
+            console.log('ByteBrew: Stay Active Event. Length: ' + 30 + 's');
         }
 
         function reinitializeByteBrew() {
@@ -244,35 +260,21 @@
             return initialized && trackingEnabled;
         }
 
-        function endCurrentSession(customValue = null) {
+        function endCurrentSession() {
             if (!getTrackingSettingsCookie()) return;
 
-            if (customValue !== null) {
-                const payload = Object.assign({}, fullEvent(), {
-                    category: 'custom_event',
-                    sdk_key: appKey,
-                    externalData: {
-                        event_name: 'stay_active', 
-                        total_duration: String(customValue)
-                    }
-                });
-
-                sendRequest(LOGS_URL, payload, true);
-                console.log('ByteBrew: Ending Session. Length: ' + customValue + 's');
-            } else {
-                const now = new Date();
-                const secs = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
-                
-                const payload = Object.assign({}, fullEvent(), {
-                    category: 'game_close',
-                    sdk_key: appKey,
-                    externalData: {
-                        sessionLength: String(secs)
-                    }
-                });
-                sendRequest(LOGS_URL, payload, true);
-                console.log('ByteBrew: Ending Session. Length: ' + secs + 's');
-            }
+            const now = new Date();
+            const secs = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
+            
+            const payload = Object.assign({}, fullEvent(), {
+                category: 'game_close',
+                sdk_key: appKey,
+                externalData: {
+                    sessionLength: String(secs)
+                }
+            });
+            sendRequest(LOGS_URL, payload, true);
+            console.log('ByteBrew: Ending Session. Length: ' + secs + 's');
         }
 
         function sendCustomEvent(eventName, value) {
