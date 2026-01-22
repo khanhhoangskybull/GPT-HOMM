@@ -189,7 +189,7 @@
             };
             const payload = Object.assign({}, fullEvent(), {
                 category: 'user',
-                geo: country,
+                geo: 'vn',
                 externalData
             });
 
