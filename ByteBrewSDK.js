@@ -205,11 +205,11 @@
                             console.log('ByteBrew: Initialization Complete');
                             // lắng nghe end session
                             // window.addEventListener('beforeunload', endCurrentSession);
-                            window.Telegram.WebApp.onEvent('viewportChanged', endCurrentSession);
+                            // window.Telegram.WebApp.onEvent('viewportChanged', endCurrentSession);
                             
-                            // if (!heartbeatInterval) {
-                            //     heartbeatInterval = setInterval(sendHeartbeat, 30000);
-                            // }
+                            if (!heartbeatInterval) {
+                                heartbeatInterval = setInterval(sendHeartbeat, 30000);
+                            }
                             
                         } else {
                             console.log("ByteBrew: Initialization Failed! Couldn't get session key from ByteBrew: Status " + (res ? res.status : 'No Response'));
@@ -249,17 +249,14 @@
 
             const now = new Date();
             const secs = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
-
             console.log('ByteBrew: Ending Session. Length: ' + secs + 's');
 
             const payload = Object.assign({}, fullEvent(), {
-                category: 'game_close',
+                category: 'custom_event',
                 sdk_key: appKey,
                 externalData: {
-                    sessionLength: String(secs)
-                    // ,
-                    // length: secs,
-                    // auth_fallback: appKey
+                    event_name: 'stay_active', // Tên event cố định
+                    total_duration: String(secs)
                 }
             });
 
