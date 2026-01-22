@@ -197,16 +197,22 @@
             sendRequest(LOGS_URL, payload)
                 .then(res => {
                     if (res && res.ok) {
+
+                        console.log("Response Headers:");
+                        res.headers.forEach((v, k) => console.log(`${k}: ${v}`));
+                        
                         const sk = res.headers.get(SESSION_KEY_HEADER);
                         if (sk) {
                             sessionKey = sk;
                             initialized = true;
                             setUserHasInitializedSuccessfullyCookie();
-                            console.log('ByteBrew: Initialization Complete');
+                            console.log('ByteBrew: Initialization Complete. Session Key:', sk);
                             // lắng nghe end session
                             // window.addEventListener('beforeunload', endCurrentSession);
-                            window.Telegram.WebApp.onEvent('viewportChanged', endCurrentSession);
-                            
+                            if (window.Telegram && window.Telegram.WebApp) {
+                                window.Telegram.WebApp.onEvent('viewportChanged', endCurrentSession);
+                            }
+
                             if (!heartbeatInterval) {
                                 heartbeatInterval = setInterval(sendHeartbeat, 30000);
                             }
