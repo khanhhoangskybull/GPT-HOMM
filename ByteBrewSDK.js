@@ -255,7 +255,7 @@
                 category: 'game_close',
                 sdk_key: appKey,
                 externalData: {
-                    sessionLength: String(secs)
+                    sessionLength: String(30)
                     // ,
                     // length: secs,
                     // auth_fallback: appKey
