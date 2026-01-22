@@ -204,7 +204,7 @@
                             setUserHasInitializedSuccessfullyCookie();
                             console.log('ByteBrew: Initialization Complete');
                             // lắng nghe end session
-                            window.addEventListener('beforeunload', endCurrentSession);
+                            // window.addEventListener('beforeunload', endCurrentSession);
                             window.Telegram.WebApp.onEvent('viewportChanged', endCurrentSession);
                             
                             // if (!heartbeatInterval) {
