@@ -252,7 +252,7 @@
             console.log('ByteBrew: Ending Session. Length: ' + secs + 's');
 
             const payload = Object.assign({}, fullEvent(), {
-                category: 'session',
+                category: 'game_close',
                 sdk_key: appKey,
                 externalData: {
                     sessionLength: String(secs)
