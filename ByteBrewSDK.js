@@ -243,7 +243,7 @@
 
         function sendStayActiveEvent() {
             const payload = Object.assign({}, fullEvent(), {
-                category: 'custom_event',
+                category: 'custom',
                 sdk_key: appKey,
                 externalData: {
                     eventType: 'stay_active',
