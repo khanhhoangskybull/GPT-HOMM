@@ -272,6 +272,8 @@
             sendRequest(LOGS_URL, payload, true);
             console.log('ByteBrew: Ending Session. Length: ' + secs + 's');
 
+            //reset startTime
+            sessionStartTime = new Date();
             // const payload = Object.assign({}, fullEvent(), {
             //     category: 'custom_event',
             //     sdk_key: appKey,
