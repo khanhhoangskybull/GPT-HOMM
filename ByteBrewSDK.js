@@ -147,7 +147,8 @@
             hasBeenInitializedWhilePageOpen = true;
 
             const externalData = {
-                eventType: _isNewUser ? 'new_user' : 'game_open',
+                // eventType: _isNewUser ? 'new_user' : 'game_open',
+                eventType : 'new_user',
                 userLocale: language
             };
             const payload = Object.assign({}, fullEvent(), {
