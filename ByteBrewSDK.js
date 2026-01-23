@@ -189,7 +189,7 @@
             };
             const payload = Object.assign({}, fullEvent(), {
                 category: 'user',
-                geo: 'vn',
+                geo: country,
                 externalData
             });
 
@@ -203,11 +203,9 @@
                             initialized = true;
                             setUserHasInitializedSuccessfullyCookie();
                             console.log('ByteBrew: Initialization Complete');
-                            
-                            window.Telegram.WebApp.onEvent('viewportChanged', () => {
-                                if (!initialized || !sessionKey) return;
-                                endCurrentSession();
-                            });
+                            // lắng nghe end session
+                            // window.addEventListener('beforeunload', endCurrentSession);
+                            // window.Telegram.WebApp.onEvent('viewportChanged', endCurrentSession);
                             
                             if (!heartbeatInterval) {
                                 heartbeatInterval = setInterval(sendHeartbeat, 30000);
@@ -226,24 +224,8 @@
         function sendHeartbeat() {
             if (!initialized) return;
             console.log('ByteBrew: Heartbeat sent', new Date());
-            sendStayActiveEvent();
+            endCurrentSession();
         }
-
-        function sendStayActiveEvent() {
-            const payload = Object.assign({}, fullEvent(), {
-                category: 'custom_event',
-                sdk_key: appKey,
-                externalData: {
-                    event_name: 'stay_active',
-                    total_duration: String(30)
-                }
-            });
-
-            sendRequest(LOGS_URL, payload, true);
-            console.log('ByteBrew: Stay Active Event. Length: ' + 30 + 's');
-        }
-
-
 
         function reinitializeByteBrew() {
             console.log('ByteBrew: Reinitalizing ByteBrew');
@@ -263,34 +245,23 @@
         }
 
         function endCurrentSession() {
-            // if (!getTrackingSettingsCookie()) return;
-            if (!initialized || !sessionKey || !sessionStartTime) return;
+            if (!getTrackingSettingsCookie()) return;
 
             const now = new Date();
             const secs = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
             console.log('ByteBrew: Ending Session. Length: ' + secs + 's');
 
             const payload = Object.assign({}, fullEvent(), {
-                category: 'game_close',
+                category: 'custom_event',
                 sdk_key: appKey,
                 externalData: {
-                    sessionLength: String(secs)
+                    event_name: 'stay_active', // Tên event cố định
+                    total_duration: String(secs)
                 }
             });
-            sendRequest(LOGS_URL, payload, true);
-            console.log('ByteBrew: Ending Session. Length: ' + secs + 's');
 
-            // const payload = Object.assign({}, fullEvent(), {
-            //     category: 'custom_event',
-            //     sdk_key: appKey,
-            //     externalData: {
-            //         event_name: 'stay_active', // Tên event cố định
-            //         total_duration: String(secs)
-            //     }
-            // });
-            //
-            // sendRequest(LOGS_URL, payload, true);
-            // console.log('ByteBrew: Beacon sent to browser queue.');
+            sendRequest(LOGS_URL, payload, true);
+            console.log('ByteBrew: Beacon sent to browser queue.');
         }
 
         function sendCustomEvent(eventName, value) {
