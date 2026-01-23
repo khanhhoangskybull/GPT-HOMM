@@ -246,7 +246,7 @@
                 category: 'custom_event',
                 sdk_key: appKey,
                 externalData: {
-                    event_type: 'stay_active',
+                    eventType: 'stay_active',
                     total_duration: String(30)
                 }
             });
