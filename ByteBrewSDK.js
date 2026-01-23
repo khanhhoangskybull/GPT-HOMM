@@ -63,8 +63,6 @@
 
         let remoteConfigs = null; // Map<string,string> | null
 
-        let heartbeatInterval = null;
-
         const language = (navigator.language || '').toString();
         function getCountryCode() {
             const parts = (navigator.language || '').split('-');
@@ -128,10 +126,25 @@
             const payload = JSON.stringify(bodyObj);
             console.log("Send Request 2 ", payload);
 
+            if (useBeacon) {
+                return fetch(url, {
+                    method: 'POST',
+                    mode: 'cors',
+                    keepalive: true,
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'sdk-key': appKey
+                    },
+                    body: payload
+                }).catch(err =>
+                    console.warn("ByteBrew Beacon-like Request Fail:", err)
+                );
+            }
+
             return fetch(url, {
                 method: 'POST',
                 mode: 'cors',
-                keepalive: true,
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
@@ -158,7 +171,7 @@
         }
 
         // ================= Public API (MUST match .jslib names) =================
-        function initializeByteBrew(_appId, _appKey, _appVersion, _unityUserID, _isNewUser) {
+        function initializeByteBrew(_appId, _appKey, _appVersion) {
             console.log('ByteBrew: Starting Initialization');
             if (initialized) return;
 
@@ -172,8 +185,10 @@
                 console.log('ByteBrew: Tracking is disabled. Not initializing.');
                 return;
             }
-            console.log('ByteBrew: Using UserID from Unity: ' + _unityUserID);
-            userID = _unityUserID;
+
+            const info = tryGetUserIDFromCookie();
+            userID = info.userID;
+
             appId = _appId;
             appKey = _appKey;
             appVersion = _appVersion || '';
@@ -183,8 +198,9 @@
             hasBeenInitializedWhilePageOpen = true;
 
             // User event: new/existing
+            const isNewUser = info.isNewUser || !info.hasSuccessfullyInitialized;
             const externalData = {
-                eventType: _isNewUser ? 'new_user' : 'game_open',
+                eventType: isNewUser ? 'new_user' : 'game_open',
                 userLocale: language
             };
             const payload = Object.assign({}, fullEvent(), {
@@ -204,13 +220,7 @@
                             setUserHasInitializedSuccessfullyCookie();
                             console.log('ByteBrew: Initialization Complete');
                             // lắng nghe end session
-                            // window.addEventListener('beforeunload', endCurrentSession);
-                            // window.Telegram.WebApp.onEvent('viewportChanged', endCurrentSession);
-
-                            if (!heartbeatInterval) {
-                                heartbeatInterval = setInterval(sendHeartbeat, 30000);
-                            }
-
+                            window.addEventListener('beforeunload', endCurrentSession);
                         } else {
                             console.log("ByteBrew: Initialization Failed! Couldn't get session key from ByteBrew: Status " + (res ? res.status : 'No Response'));
                         }
@@ -219,12 +229,6 @@
                     }
                 })
                 .catch(err => console.error(err));
-        }
-
-        function sendHeartbeat() {
-            if (!initialized) return;
-            console.log('ByteBrew: Heartbeat sent', new Date());
-            endCurrentSession();
         }
 
         function reinitializeByteBrew() {
@@ -249,19 +253,23 @@
 
             const now = new Date();
             const secs = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
+
             console.log('ByteBrew: Ending Session. Length: ' + secs + 's');
 
             const payload = Object.assign({}, fullEvent(), {
-                category: 'custom_event',
+                category: 'session',
                 sdk_key: appKey,
                 externalData: {
-                    event_name: 'stay_active', // Tên event cố định
-                    total_duration: String(secs)
+                    sessionLength: String(secs),
+                    length: secs,
+                    auth_fallback: appKey
                 }
             });
 
             sendRequest(LOGS_URL, payload, true);
+
             console.log('ByteBrew: Beacon sent to browser queue.');
+            initialized = false;
         }
 
         function sendCustomEvent(eventName, value) {
