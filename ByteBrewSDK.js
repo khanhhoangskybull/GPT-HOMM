@@ -247,7 +247,7 @@
                 sdk_key: appKey,
                 externalData: {
                     eventType: 'stay_active',
-                    total_duration: String(30)
+                    value: String(30)
                 }
             });
 
