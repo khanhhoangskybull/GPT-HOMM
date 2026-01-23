@@ -203,9 +203,11 @@
                             initialized = true;
                             setUserHasInitializedSuccessfullyCookie();
                             console.log('ByteBrew: Initialization Complete');
-                            // lắng nghe end session
-                            // window.addEventListener('beforeunload', endCurrentSession);
-                            window.Telegram.WebApp.onEvent('viewportChanged', endCurrentSession);
+                            
+                            window.Telegram.WebApp.onEvent('viewportChanged', () => {
+                                if (!initialized || !sessionKey) return;
+                                endCurrentSession();
+                            });
                             
                             if (!heartbeatInterval) {
                                 heartbeatInterval = setInterval(sendHeartbeat, 30000);
@@ -261,7 +263,8 @@
         }
 
         function endCurrentSession() {
-            if (!getTrackingSettingsCookie()) return;
+            // if (!getTrackingSettingsCookie()) return;
+            if (!initialized || !sessionKey || !sessionStartTime) return;
 
             const now = new Date();
             const secs = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
