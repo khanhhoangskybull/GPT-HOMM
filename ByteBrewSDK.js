@@ -62,7 +62,8 @@
         let sessionStartTime = null;
 
         let remoteConfigs = null; // Map<string,string> | null
-
+        let heartbeatInterval = null;
+        
         const language = (navigator.language || '').toString();
         function getCountryCode() {
             const parts = (navigator.language || '').split('-');
