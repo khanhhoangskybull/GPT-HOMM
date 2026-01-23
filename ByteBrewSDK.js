@@ -120,6 +120,64 @@
             });
         }
 
+        function initializeByteBrew(_appId, _appKey, _appVersion, _unityUserID, _isNewUser) {
+            console.log('ByteBrew: Starting Initialization');
+            if (initialized) return;
+
+            if (!_appId || !_appKey) {
+                console.error('ByteBrew: Initialization Failed. Please provide all the required parameters.');
+                return;
+            }
+
+            trackingEnabled = getTrackingSettingsCookie();
+            if (!trackingEnabled) {
+                console.log('ByteBrew: Tracking is disabled. Not initializing.');
+                return;
+            }
+
+            console.log('ByteBrew: Using UserID from Unity: ' + _unityUserID);
+            userID = _unityUserID;
+
+            appId = _appId;
+            appKey = _appKey;
+            appVersion = _appVersion || '';
+            sessionID = uuidv4();
+            sessionKey = '';
+            sessionStartTime = new Date();
+            hasBeenInitializedWhilePageOpen = true;
+
+            const externalData = {
+                eventType: _isNewUser ? 'new_user' : 'game_open',
+                userLocale: language
+            };
+            const payload = Object.assign({}, fullEvent(), {
+                category: 'user',
+                geo: country,
+                externalData
+            });
+
+            // Gửi init → đọc session_key ở header
+            sendRequest(LOGS_URL, payload)
+                .then(res => {
+                    if (res && res.ok) {
+                        const sk = res.headers.get(SESSION_KEY_HEADER);
+                        if (sk) {
+                            sessionKey = sk;
+                            initialized = true;
+                            setUserHasInitializedSuccessfullyCookie();
+                            console.log('ByteBrew: Initialization Complete');
+                            // lắng nghe end session
+                            window.addEventListener('beforeunload', endCurrentSession);
+                        } else {
+                            console.log("ByteBrew: Initialization Failed! Couldn't get session key from ByteBrew: Status " + (res ? res.status : 'No Response'));
+                        }
+                    } else {
+                        console.log("ByteBrew: Initialization Failed! Couldn't get session key from ByteBrew: Status " + (res ? res.status : 'No Response'));
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+
         // ---- web requestor (khớp .jspre) ----
         function sendRequest(url, bodyObj, useBeacon = false) {
             console.log("Send Request 1 ", bodyObj);
@@ -171,65 +229,7 @@
         }
 
         // ================= Public API (MUST match .jslib names) =================
-        function initializeByteBrew(_appId, _appKey, _appVersion) {
-            console.log('ByteBrew: Starting Initialization');
-            if (initialized) return;
-
-            if (!_appId || !_appKey) {
-                console.error('ByteBrew: Initialization Failed. Please provide all the required parameters.');
-                return;
-            }
-
-            trackingEnabled = getTrackingSettingsCookie();
-            if (!trackingEnabled) {
-                console.log('ByteBrew: Tracking is disabled. Not initializing.');
-                return;
-            }
-
-            const info = tryGetUserIDFromCookie();
-            userID = info.userID;
-
-            appId = _appId;
-            appKey = _appKey;
-            appVersion = _appVersion || '';
-            sessionID = uuidv4();
-            sessionKey = '';
-            sessionStartTime = new Date();
-            hasBeenInitializedWhilePageOpen = true;
-
-            // User event: new/existing
-            const isNewUser = info.isNewUser || !info.hasSuccessfullyInitialized;
-            const externalData = {
-                eventType: isNewUser ? 'new_user' : 'game_open',
-                userLocale: language
-            };
-            const payload = Object.assign({}, fullEvent(), {
-                category: 'user',
-                geo: country,
-                externalData
-            });
-
-            // Gửi init → đọc session_key ở header
-            sendRequest(LOGS_URL, payload)
-                .then(res => {
-                    if (res && res.ok) {
-                        const sk = res.headers.get(SESSION_KEY_HEADER);
-                        if (sk) {
-                            sessionKey = sk;
-                            initialized = true;
-                            setUserHasInitializedSuccessfullyCookie();
-                            console.log('ByteBrew: Initialization Complete');
-                            // lắng nghe end session
-                            window.addEventListener('beforeunload', endCurrentSession);
-                        } else {
-                            console.log("ByteBrew: Initialization Failed! Couldn't get session key from ByteBrew: Status " + (res ? res.status : 'No Response'));
-                        }
-                    } else {
-                        console.log("ByteBrew: Initialization Failed! Couldn't get session key from ByteBrew: Status " + (res ? res.status : 'No Response'));
-                    }
-                })
-                .catch(err => console.error(err));
-        }
+        
 
         function reinitializeByteBrew() {
             console.log('ByteBrew: Reinitalizing ByteBrew');
