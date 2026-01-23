@@ -229,12 +229,12 @@
           Telegram.WebApp.enableClosingConfirmation();
 
           // Bắt khoảnh khắc ngay trước khi popup hiện ra
-          window.addEventListener("blur", function() {
-              console.log("Window blur detected!");
-              sendExitEvent();
-          });
+          <!-- window.addEventListener("blur", function() { -->
+              <!-- console.log("Window blur detected!"); -->
+              <!-- sendExitEvent(); -->
+          <!-- }); -->
 
-          window.addEventListener("pagehide", sendExitEvent);
+          <!-- window.addEventListener("pagehide", sendExitEvent); -->
       }
 
       // 2. Đăng ký nút Test bên trong load để đảm bảo nút đã tồn tại
